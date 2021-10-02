@@ -57,24 +57,11 @@ func init() {
 
 func HandleShortenedUrl(shortenedUrl string) string {
 
-	toFind := "http://localhost:8080/" + shortenedUrl
+	elemToFind := "http://localhost:8080/" + shortenedUrl
 
-	filterCursor, err := collection.Find(context.Background(), bson.M{"shortenedurl": toFind})
+	elemFound := searchForUrl("shortenedurl", elemToFind)
 
-	if err != nil {
-		log.Fatal(err)
-	}
-	var filteredUrl []models.Link
-
-	if err = filterCursor.All(context.Background(), &filteredUrl); err != nil {
-		log.Fatal(err)
-	}
-
-	if len(filteredUrl) > 0 {
-		return filteredUrl[0].OriginURL
-	}
-
-	return "http://localhost:3000"
+	return elemFound.OriginURL
 }
 
 func PostLink(w http.ResponseWriter, r *http.Request) {
@@ -106,6 +93,34 @@ func PostLink(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+func searchForUrl(key string, value string) models.Link {
+	filterCursor, err := collection.Find(context.Background(), bson.M{key: value})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var filteredUrl []models.Link
+
+	if err = filterCursor.All(context.Background(), &filteredUrl); err != nil {
+		log.Fatal(err)
+	}
+
+	if len(filteredUrl) > 0 {
+		return filteredUrl[0]
+	}
+
+	return models.Link{}
+}
+
+func checkUrl(url string) string{
+	
+	foundElem := searchForUrl("originurl", url)
+
+	return foundElem.ShortenedURL
+
+}
+
 func insertOneLink(link models.Link) {
 	insertResult, err := collection.InsertOne(context.Background(), link)
 
@@ -114,23 +129,4 @@ func insertOneLink(link models.Link) {
 	}
 
 	fmt.Println("Inserted a Single Record ", insertResult.InsertedID)
-}
-
-func checkUrl(url string) string{
-	filterCursor, err := collection.Find(context.Background(), bson.M{"originurl": url})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	var filteredUrl []models.Link
-	
-	if err = filterCursor.All(context.Background(), &filteredUrl); err != nil {
-		log.Fatal(err)
-	}
-
-	if len(filteredUrl) > 0 {
-		return filteredUrl[0].ShortenedURL
-	}
-
-	return ""
 }

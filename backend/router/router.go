@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ogierhaq/url_shortener/backend/middleware"
@@ -22,5 +23,6 @@ func handleRedirect(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	shortURL := vars["ShortURL"]
 	originURL := middleware.HandleShortenedUrl(shortURL)
+	fmt.Println(originURL)
 	http.Redirect(w, r, originURL, http.StatusSeeOther)	
 }
