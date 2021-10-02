@@ -55,27 +55,26 @@ func init() {
 	fmt.Println("Collection instance created")
 }
 
-// func handlePostedUrl(w http.ResponseWriter, r *http.Request) {
+func HandleShortenedUrl(shortenedUrl string) string {
 
-// }
+	toFind := "http://localhost:8080/" + shortenedUrl
 
-func checkUrl(url string) string{
-	filterCursor, err := collection.Find(context.Background(), bson.M{"originurl": url})
+	filterCursor, err := collection.Find(context.Background(), bson.M{"shortenedurl": toFind})
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	var filteredUrl []models.Link
-	
+
 	if err = filterCursor.All(context.Background(), &filteredUrl); err != nil {
 		log.Fatal(err)
 	}
 
 	if len(filteredUrl) > 0 {
-		return filteredUrl[0].ShortenedURL
+		return filteredUrl[0].OriginURL
 	}
 
-	return ""
+	return "http://localhost:3000"
 }
 
 func PostLink(w http.ResponseWriter, r *http.Request) {
@@ -115,4 +114,23 @@ func insertOneLink(link models.Link) {
 	}
 
 	fmt.Println("Inserted a Single Record ", insertResult.InsertedID)
+}
+
+func checkUrl(url string) string{
+	filterCursor, err := collection.Find(context.Background(), bson.M{"originurl": url})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	var filteredUrl []models.Link
+	
+	if err = filterCursor.All(context.Background(), &filteredUrl); err != nil {
+		log.Fatal(err)
+	}
+
+	if len(filteredUrl) > 0 {
+		return filteredUrl[0].ShortenedURL
+	}
+
+	return ""
 }

@@ -28,14 +28,13 @@ const URLShortener = () => {
       }
     );
     setShortUrl(response.data);
-    console.log(response);
   }
 
   return (
     <Container>
       <Row className="justify-content-md-center">
         <Col xs lg="3">
-          <Form method="POST" action="/">
+          <Form method="POST">
             <div className="text-center">
               <Form.Label className="m-3">URL Shortener</Form.Label>
               <Form.Control
