@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import "./URLShortener.css";
-import { Button, Container, Row, Col, Form } from "react-bootstrap";
+import { Button, Container, Row, Col, Form, Alert } from "react-bootstrap";
 
 const endpoint = "http://127.0.0.1:8080";
 
@@ -16,14 +16,14 @@ const URLShortener = () => {
 
   const handleValidation = (url) => {
     let pattern = new RegExp(
-      "^(https?:\\/\\/)?" +                                   // protocol
-        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" +  // domain name
-        "((\\d{1,3}\\.){3}\\d{1,3}))" +                       // OR ip (v4) address
-        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" +                   // port and path
-        "(\\?[;&a-z\\d%_.~+=-]*)?" +                          // query string
-        "(\\#[-a-z\\d_]*)?$",                                 // fragment locator
+      "^(https?:\\/\\/)?" + // protocol
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+        "(\\#[-a-z\\d_]*)?$", // fragment locator
       "i"
-    ); 
+    );
     const regex = new RegExp(pattern);
 
     return url.match(regex);
@@ -54,12 +54,11 @@ const URLShortener = () => {
   return (
     <Container>
       <Row className="justify-content-md-center">
-        <Col xs lg="3">
+        <Col lg="6" md="8" sm="12" >
           <Form method="POST">
-            <div className="text-center">
-              <Form.Label className="m-3">URL Shortener</Form.Label>
+            <div className="text-center d-grid">
+              <Form.Label className="m-3"><h1>URL Shortener</h1></Form.Label>
               <Form.Control
-                name="url"
                 type="url"
                 placeholder="Your URL"
                 onChange={handleURLChange}
@@ -74,8 +73,16 @@ const URLShortener = () => {
               >
                 Shorten Your URL
               </Button>
-              {shortUrl && <a href={shortUrl}>{shortUrl}</a>}
-              {error && <div>URL is not valid </div>}
+              {shortUrl && (
+                <Alert className="text-center" variant="success">
+                  <a href={shortUrl}>{shortUrl}</a>
+                </Alert>
+              )}
+              {error && (
+                <Alert className="text-center" variant="danger">
+                  URL is not valid{" "}
+                </Alert>
+              )}
             </div>
           </Form>
         </Col>
