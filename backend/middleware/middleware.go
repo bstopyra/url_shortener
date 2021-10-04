@@ -15,38 +15,30 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// DB connection string
-const connectionString = "mongodb+srv://admin:IgnRGGIlVxNGeKMv@cluster0.6bhdk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-
-// Database Name
+const connectionString = "mongodb+srv://name:password@cluster0.6bhdk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 const dbName = "url_shortener"
-
-// Collection Name
 const collName = "urls"
-
-// collection object/instance
+const endpoint = "http://localhost:8080/"
 var collection *mongo.Collection
 
-// create connection with mongo db
 func init() {
 	
-	// Set client options
 	clientOptions := options.Client().ApplyURI(connectionString)
 
-	// connect to MongoDB
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(ctx, clientOptions)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Check the connection
 	err = client.Ping(ctx, nil)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	defer cancel()
 
 	collection = client.Database(dbName).Collection(collName)
 
@@ -56,9 +48,7 @@ func init() {
 }
 
 func HandleShortenedUrl(shortenedUrl string) string {
-
-	elemToFind := "http://localhost:8080/" + shortenedUrl
-
+	elemToFind := endpoint + shortenedUrl
 	elemFound := searchForUrl("shortenedurl", elemToFind)
 
 	return elemFound.OriginURL
@@ -84,7 +74,7 @@ func PostLink(w http.ResponseWriter, r *http.Request) {
 	} else {
 		link := models.Link{
 			OriginURL: url,
-			ShortenedURL: "http://localhost:8080/" + shortener.RandStringRuner(7),
+			ShortenedURL: endpoint + shortener.RandStringRuner(7),
 		}
 	
 		fmt.Fprintf(w, "%v", link.ShortenedURL)
