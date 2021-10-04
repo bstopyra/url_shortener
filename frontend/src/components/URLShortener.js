@@ -54,10 +54,12 @@ const URLShortener = () => {
   return (
     <Container>
       <Row className="justify-content-md-center">
-        <Col lg="6" md="8" sm="12" >
+        <Col lg="6" md="8" sm="12">
           <Form method="POST">
             <div className="text-center d-grid">
-              <Form.Label className="m-3"><h1>URL Shortener</h1></Form.Label>
+              <Form.Label className="m-3">
+                <h1>URL Shortener</h1>
+              </Form.Label>
               <Form.Control
                 type="url"
                 placeholder="Your URL"
@@ -80,7 +82,7 @@ const URLShortener = () => {
               )}
               {error && (
                 <Alert className="text-center" variant="danger">
-                  URL is not valid{" "}
+                  URL is not valid
                 </Alert>
               )}
             </div>
