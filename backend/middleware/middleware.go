@@ -37,20 +37,23 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	
+	fmt.Println("Connected to MongoDB!")
+	
 	defer cancel()
 
 	collection = client.Database(dbName).Collection(collName)
 
-	fmt.Println("Connected to MongoDB!")
 	fmt.Println("Collection instance created")
 }
 
 func HandleShortenedUrl(shortenedUrl string) string {
 	elemToFind := endpoint + shortenedUrl
 	elemFound := searchForUrl("shortenedurl", elemToFind)
-
-	return elemFound.OriginURL
+	if len(elemFound.OriginURL) > 0 {
+		return elemFound.OriginURL
+	}
+	return "http://localhost:3000"
 }
 
 func PostLink(w http.ResponseWriter, r *http.Request) {
@@ -68,17 +71,20 @@ func PostLink(w http.ResponseWriter, r *http.Request) {
 		url = key
 	}
 
-	if len(checkUrl(url)) > 0 {
-		fmt.Fprintf(w, "%v", checkUrl(url))
+	foundElem := searchForUrl("originurl", url)
+
+	if len(foundElem.ShortenedURL) > 0 {
+		fmt.Fprintf(w, "%v", foundElem.ShortenedURL)
 	} else {
 		link := models.Link{
 			OriginURL: url,
 			ShortenedURL: endpoint + shortener.RandStringRuner(7),
 		}
 	
+		insertOneLink(link)
+
 		fmt.Fprintf(w, "%v", link.ShortenedURL)
 	
-		insertOneLink(link)
 	}	
 }
 
@@ -100,14 +106,6 @@ func searchForUrl(key string, value string) models.Link {
 	}
 
 	return models.Link{}
-}
-
-func checkUrl(url string) string{
-	
-	foundElem := searchForUrl("originurl", url)
-
-	return foundElem.ShortenedURL
-
 }
 
 func insertOneLink(link models.Link) {
