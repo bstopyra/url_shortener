@@ -43,7 +43,6 @@ func init() {
 	collection = client.Database(dbName).Collection(collName)
 
 	fmt.Println("Connected to MongoDB!")
-
 	fmt.Println("Collection instance created")
 }
 
